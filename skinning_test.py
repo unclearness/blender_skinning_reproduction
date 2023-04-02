@@ -63,25 +63,13 @@ if __name__ == '__main__':
         bind.append(np.linalg.inv(inv_bind[-1]))
         trans.append(np.array(bones[k]['matrix_basis']))
 
-    bone2world = np.zeros((3, 4, 4))
     bind2world = np.zeros((3, 4, 4))
 
     pose_bone_matices = []
     for i, k in enumerate(keys):
         pose_bone_matices.append(matrix_world(bind, trans, i))
     for i, k in enumerate(keys):
-
-        #trs = np.array(bones[k]['local_to_parent'])
-        if i < 1:
-            trs = pose_bone_matices[0]
-        else:
-            trs = np.linalg.inv(pose_bone_matices[i-1]) @ pose_bone_matices[i]
-
-        if i == 0:
-            bone2world[i] = trs
-        else:
-            bone2world[i] = bone2world[i - 1] @ trs
-        bind2world[i] = bone2world[i] @ np.array(bones[k]['inv_bind'])
+        bind2world[i] = pose_bone_matices[i] @ np.array(bones[k]['inv_bind'])
 
     rest = obj_io.loadObj('cylinder_rest.obj')
     weights = np.zeros((len(rest.verts), len(bind2world)))
